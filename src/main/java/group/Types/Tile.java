@@ -8,5 +8,5 @@ public class Tile {
     public int w = 0;
     public int h = 0;
 
-    public TileIds =
+    public TileIds id = TileIds.placeholdertexture;
 }
