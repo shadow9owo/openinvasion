@@ -10,7 +10,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static group.Data.Helpers.GetPersistantPath;
 
@@ -22,41 +24,51 @@ public class Level {
 
     public static void Init()
     {
-        Path yamlPath = GetPersistantPath().resolve("tiles.yaml");
-        List<YamlTile> list = new ArrayList<>();
+        try {
+            Path base = GetPersistantPath();
+            System.out.println("PERSIST PATH = " + base.toAbsolutePath());
+            Files.createDirectories(base);
 
-        Yaml yaml = new Yaml();
+            Path yamlPath = base.resolve("tiles.yaml");
+            Yaml yaml = new Yaml();
 
-        if (!Files.exists(yamlPath)) {
-            list = new ArrayList<>();
+            List<Map<String, Object>> list;
 
-            for (TileIds id : TileIds.values()) {
-                Rect rect = Helpers.TileIdToRect(id);
+            if (!Files.exists(yamlPath)) {
+                list = new ArrayList<>();
 
-                YamlTile a = new YamlTile();
-                a.id = id.name();
-                a.x = rect.x;
-                a.y = rect.y;
-                a.w = rect.w;
-                a.h = rect.h;
+                for (TileIds id : TileIds.values()) {
+                    Rect rect = Helpers.TileIdToRect(id);
 
-                list.add(a);
-            }
+                    Map<String, Object> a = new LinkedHashMap<>();
+                    a.put("id", id.name());
+                    a.put("x", rect.x);
+                    a.put("y", rect.y);
+                    a.put("w", rect.w);
+                    a.put("h", rect.h);
 
-            try {
+                    list.add(a);
+                }
+
                 Files.writeString(yamlPath, yaml.dump(list));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
-        }
 
-        try (InputStream in = Files.newInputStream(yamlPath)) {
-            list = yaml.loadAs(in, ArrayList.class);
-        } catch (IOException e) {
+            try (InputStream in = Files.newInputStream(yamlPath)) {
+                list = yaml.load(in);
+            }
+
+            for (Map<String, Object> m : list) {
+                String id = (String) m.get("id");
+                int x = (int) m.get("x");
+                int y = (int) m.get("y");
+                int w = (int) m.get("w");
+                int h = (int) m.get("h");
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-        //need to load or export x,y,w,h,id and foreach it through all the ids
-        return;
     }
 }
