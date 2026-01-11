@@ -17,11 +17,11 @@ public class Helpers {
         {
 
             case zombie:
-                break;
+                return new group.Types.Rect(438, 525 , 3, 5);
             case wooden_floor:
-                break;
+                return new group.Types.Rect(3037, 2137, 128, 128);
             case whitecrackedwall:
-                break;
+                return new group.Types.Rect(2619, 1142, 64, 64);
             case vendingmachine:
                 break;
             case tutorial:

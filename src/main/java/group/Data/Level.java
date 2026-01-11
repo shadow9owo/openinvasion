@@ -1,69 +1,62 @@
 package group.Data;
 
 import group.Types.Rect;
+import group.Types.Tile;
 import group.Types.TileIds;
 import org.yaml.snakeyaml.Yaml;
 
-import java.awt.geom.Rectangle2D;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import static group.Data.Helpers.GetPersistantPath;
 
 public class Level {
-    public static class YamlTile {
-        public String id;
-        public int x, y, w, h;
+
+    public static class TilesConfig {
+        public java.util.List<Tile> tiles = new java.util.ArrayList<>();
     }
 
-    public static void Init()
-    {
+    public static void Init() {
         try {
             Path base = GetPersistantPath();
-            System.out.println("PERSIST PATH = " + base.toAbsolutePath());
             Files.createDirectories(base);
 
             Path yamlPath = base.resolve("tiles.yaml");
             Yaml yaml = new Yaml();
 
-            List<Map<String, Object>> list;
+            TilesConfig config;
 
             if (!Files.exists(yamlPath)) {
-                list = new ArrayList<>();
+                config = new TilesConfig();
 
                 for (TileIds id : TileIds.values()) {
                     Rect rect = Helpers.TileIdToRect(id);
+                    if (rect == null || rect.w <= 0 || rect.h <= 0) continue;
 
-                    Map<String, Object> a = new LinkedHashMap<>();
-                    a.put("id", id.name());
-                    a.put("x", rect.x);
-                    a.put("y", rect.y);
-                    a.put("w", rect.w);
-                    a.put("h", rect.h);
+                    Tile t = new Tile();
+                    t.id = id;
+                    t.x = rect.x;
+                    t.y = rect.y;
+                    t.w = rect.w;
+                    t.h = rect.h;
 
-                    list.add(a);
+                    config.tiles.add(t);
                 }
 
-                Files.writeString(yamlPath, yaml.dump(list));
+                Files.writeString(yamlPath, yaml.dump(config));
             }
 
             try (InputStream in = Files.newInputStream(yamlPath)) {
-                list = yaml.load(in);
+                config = yaml.loadAs(in, TilesConfig.class);
             }
 
-            for (Map<String, Object> m : list) {
-                String id = (String) m.get("id");
-                int x = (int) m.get("x");
-                int y = (int) m.get("y");
-                int w = (int) m.get("w");
-                int h = (int) m.get("h");
-
+            for (Tile t : config.tiles) {
+                TileIds id = t.id;
+                int x = t.x;
+                int y = t.y;
+                int w = t.w;
+                int h = t.h;
             }
 
         } catch (Exception e) {
