@@ -66,7 +66,6 @@ public class Config {
         if (ImGui.button("Upload!"))
         {
             if (CurrentData.Config.level.steamid != 0) {
-                // Try update first
                 SteamUGCUpdateHandle handle =
                         ugc.startItemUpdate(
                                 4272680,
@@ -116,14 +115,8 @@ public class Config {
                 ugc.setItemPreview(handle, GetPersistantPath() + "/tmp/preview.png");
 
                 ugc.submitItemUpdate(handle, "Updated level");
-
-                JOptionPane.showMessageDialog(null, "Uploaded!", "Level was successfully updated!",
-                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 ugc.createItem(4272680, SteamRemoteStorage.WorkshopFileType.Community);
-
-                JOptionPane.showMessageDialog(null, "Uploaded!", "Level was successfully uploaded!",
-                        JOptionPane.INFORMATION_MESSAGE);
 
                 SteamUserStats steamStats =
                         new SteamUserStats(new SteamUserStatsCallback() {});
