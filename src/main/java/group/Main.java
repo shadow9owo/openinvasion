@@ -9,12 +9,14 @@ import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 
+import group.ImgUi.Frames.*;
+
 import group.ImgUi.Helpers;
 
 public class Main {
 
     public static Raylib rlj;
-    private static ImGuiImplGl3 imGuiGl3;
+    public static ImGuiImplGl3 imGuiGl3;
 
     public static void main(String[] args) {
 
@@ -42,11 +44,10 @@ public class Main {
 
             imGuiGl3.newFrame();
 
-            ImGui.newFrame();
-
-            //ImGui.showDemoWindow();
-
-            ImGui.render();
+            Config.Render();
+            Layerlist.Render();
+            Textures.Render();
+            Tools.Render();
 
             rlj.core.BeginDrawing();
             rlj.core.ClearBackground(Color.DARKGRAY);
