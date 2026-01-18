@@ -9,10 +9,13 @@ public class Layer {
     public List<Tile> tiles;
     public int layerid;
 
-    public Layer(List<Tile> tiles,int layer)
-    {
-        tiles = new ArrayList<Tile>();
-        this.tiles = tiles;
-        this.layerid = layer;
+    public Layer() {
+        this.tiles = new ArrayList<>();
+        this.layerid = -1;
+    }
+
+    public Layer(List<Tile> tiles, int layerid) {
+        this.tiles = (tiles != null) ? new ArrayList<>(tiles) : new ArrayList<>();
+        this.layerid = layerid;
     }
 }

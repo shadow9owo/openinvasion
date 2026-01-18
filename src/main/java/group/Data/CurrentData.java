@@ -6,17 +6,21 @@ import group.Types.Layer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CurrentData {
     public static String FilePath;
+    public static int NEXT_LAYER_ID = 0;
 
-    public class Config
+    public static class Config
     {
         public static TileIds selectedtile;
+        public static String levelname;
+        public static group.Types.Level level = new group.Types.Level();
     }
 
     public static int currentlayer;
-    public static Layer[] layers = new Layer[1024];
 
     public static String GetPath()
     {

@@ -1,68 +1,93 @@
-package group;
+    package group;
 
-import com.raylib.java.Raylib;
-import com.raylib.java.core.Color;
+    import com.raylib.java.Raylib;
+    import com.raylib.java.core.Color;
 
-import group.Data.CurrentData;
-import imgui.ImGui;
-import imgui.ImGuiIO;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.gl3.ImGuiImplGl3;
+    import group.Data.CurrentData;
+    import group.Types.Layer;
+    import group.Types.Level;
+    import group.Types.Tile;
+    import imgui.ImGui;
+    import imgui.ImGuiIO;
+    import imgui.flag.ImGuiConfigFlags;
+    import imgui.gl3.ImGuiImplGl3;
 
-import group.ImgUi.Frames.*;
+    import group.ImgUi.Frames.*;
 
-import group.ImgUi.Helpers;
+    import group.ImgUi.Helpers;
 
-public class Main {
+    import java.io.File;
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.List;
 
-    public static Raylib rlj;
-    public static ImGuiImplGl3 imGuiGl3;
+    public class Main {
 
-    public static void main(String[] args) {
+        public static Raylib rlj;
+        public static ImGuiImplGl3 imGuiGl3;
 
-        Helpers.OSCheckWarning();
+        public static void main(String[] args) {
 
-        CurrentData.FilePath = CurrentData.GetPath();
+            Helpers.OSCheckWarning();
 
-        rlj = new Raylib();
-        rlj.core.InitWindow(800, 800, "openinvasion editor");
-        rlj.core.SetTargetFPS(60);
+            CurrentData.FilePath = CurrentData.GetPath();
 
-        ImGui.createContext();
-        ImGui.getIO().addConfigFlags(ImGuiConfigFlags.DockingEnable);
+            File f = new File(CurrentData.FilePath);
 
-        imGuiGl3 = new ImGuiImplGl3();
-        imGuiGl3.init("#version 330 core");
+            if (f.exists() && !f.isDirectory())
+            {
+                group.Types.Level.Load();
+            }else
+            {
+                CurrentData.Config.levelname = "untitled";
+                group.Types.Level.Save("untitled",CurrentData.Config.level.leveldata, CurrentData.NEXT_LAYER_ID);
+            }
 
-        while (!rlj.core.WindowShouldClose()) {
+            rlj = new Raylib();
+            rlj.core.InitWindow(800, 800, "openinvasion editor");
+            rlj.core.SetTargetFPS(60);
 
-            ImGuiIO io = ImGui.getIO();
-            io.setDisplaySize(800, 800);
-            io.setDeltaTime(1.0f / 60.0f);
+            group.Data.Textures.Init();
 
-            Helpers.updateImGuiInput();
+            ImGui.createContext();
+            ImGui.getIO().addConfigFlags(ImGuiConfigFlags.DockingEnable);
 
-            imGuiGl3.newFrame();
+            imGuiGl3 = new ImGuiImplGl3();
+            imGuiGl3.init("#version 330 core");
 
-            Config.Render();
-            Layerlist.Render();
-            Textures.Render();
-            Tools.Render();
+            while (!rlj.core.WindowShouldClose()) {
 
-            rlj.core.BeginDrawing();
-            rlj.core.ClearBackground(Color.DARKGRAY);
+                ImGuiIO io = ImGui.getIO();
+                io.setDisplaySize(800, 800);
+                io.setDeltaTime(1.0f / 60.0f);
 
-            rlj.core.rlgl.rlDisableDepthTest();
-            rlj.core.rlgl.rlEnableColorBlend();
+                Helpers.updateImGuiInput();
 
-            imGuiGl3.renderDrawData(ImGui.getDrawData());
+                imGuiGl3.newFrame();
 
-            rlj.core.EndDrawing();
+                ImGui.newFrame();
+
+                Config.Render();
+                Layerlist.Render();
+                Textures.Render();
+                //Tools.Render();
+
+                ImGui.render();
+
+                rlj.core.BeginDrawing();
+                rlj.core.ClearBackground(Color.DARKGRAY);
+
+                rlj.core.rlgl.rlDisableDepthTest();
+                rlj.core.rlgl.rlEnableColorBlend();
+
+                imGuiGl3.renderDrawData(ImGui.getDrawData());
+
+                rlj.core.EndDrawing();
+            }
+
+
+            imGuiGl3.shutdown();
+            ImGui.destroyContext();
+            rlj.core.CloseWindow();
         }
-
-
-        imGuiGl3.shutdown();
-        ImGui.destroyContext();
-        rlj.core.CloseWindow();
     }
-}

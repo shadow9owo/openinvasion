@@ -15,7 +15,7 @@ public class Textures {
 
     static Texture2D spritesheet2;
     static Texture2D spritesheet1;
-    static Dictionary<TileIds, Texture2D> text = new Hashtable<>();
+    public static Dictionary<TileIds, Texture2D> text = new Hashtable<>();
 
     public static Texture2D GetTexture(TileIds id)
     {

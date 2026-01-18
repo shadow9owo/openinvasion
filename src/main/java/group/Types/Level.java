@@ -1,75 +1,108 @@
 package group.Types;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import group.Data.CurrentData;
-import org.yaml.snakeyaml.*;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Level {
-    public static String Name;
-    public static List<Layer> Leveldata;
 
-    public Level(String name, List<Layer> leveldata) {
-        this.Name = name;
-        if (leveldata == null)
-        {
-            this.Leveldata = new ArrayList<>();
-        }else {
-            this.Leveldata = leveldata;
+    public String name;
+    public List<Layer> leveldata;
+    public int nextid;
+
+    public Level() {
+        this.leveldata = new ArrayList<>();
+    }
+
+    public Level(String name, List<Layer> leveldata,int nextid_) {
+        this.name = name;
+        this.leveldata = (leveldata != null) ? leveldata : new ArrayList<>();
+        this.nextid = nextid_;
+    }
+
+    public void applyFrom(Level other) {
+        if (other == null) return;
+
+        this.name = other.name;
+
+        this.leveldata.clear();
+
+        for (Layer src : other.leveldata) {
+            if (src == null) continue;
+
+            Layer copy = new Layer(
+                    new ArrayList<>(src.tiles),
+                    src.layerid
+            );
+
+            this.leveldata.add(copy);
         }
     }
 
-
     public static void Load() {
-        try {
+        try (FileInputStream in = new FileInputStream(CurrentData.FilePath)) {
+
             Yaml yaml = new Yaml();
+            Level loaded = yaml.loadAs(in, Level.class);
 
-            try (FileInputStream in = new FileInputStream(CurrentData.FilePath)) {
-                Level loaded = yaml.loadAs(in, Level.class);
-
-                if (loaded != null) {
-                    Name = loaded.Name;
-                    if (loaded.Leveldata == null)
-                    {
-                        Leveldata = new ArrayList<>();
-                    }else {
-                        Leveldata = loaded.Leveldata;
-                    }
+            if (loaded != null) {
+                if (CurrentData.Config.level == null) {
+                    CurrentData.Config.level = new Level();
                 }
+                CurrentData.Config.level.applyFrom(loaded);
+                CurrentData.Config.level.leveldata = loaded.leveldata;
+                CurrentData.Config.levelname = loaded.name;
+                CurrentData.NEXT_LAYER_ID = loaded.nextid;
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return;
     }
 
-    public static void Save(String name, Layer[] list) {
+    public static void Save(String name, List<Layer> layers,int nextid_) {
         try {
-            Level level = new Level(name, new ArrayList<>());
-            level.Leveldata.addAll(Arrays.asList(list));
+            Level temp;
+
+            if (!CurrentData.FilePath.toLowerCase().endsWith(".hil")) {
+                CurrentData.FilePath = CurrentData.FilePath + ".hil";
+            }
+
+            temp = new Level(name, new ArrayList<>(),nextid_);
+
+            for (Layer l : layers) {
+                temp.leveldata.add(l);
+            }
 
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setPrettyFlow(true);
 
-            Yaml yaml = new Yaml(options);
+            Representer representer = new Representer(options);
+            representer.addClassTag(Level.class, Tag.MAP);
+
+            Yaml yaml = new Yaml(representer, options);
 
             try (FileWriter writer = new FileWriter(CurrentData.FilePath)) {
-                yaml.dump(level, writer);
+                yaml.dump(temp, writer);
             }
+
+            if (CurrentData.Config.level == null) {
+                CurrentData.Config.level = new Level();
+            }
+            CurrentData.Config.level.applyFrom(temp);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return;
     }
 }
