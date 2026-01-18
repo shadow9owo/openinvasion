@@ -32,9 +32,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import group.Types.OwnerShipState;
-
 import group.Steam.*;
+
+import javax.swing.*;
 
 import static com.raylib.java.core.Color.*;
 import static group.Data.Helpers.GetPersistantPath;
@@ -43,20 +43,16 @@ public class Main {
 
     public static RenderTexture renderTexture;
 
-    public static OwnerShipState ownershipState = OwnerShipState.NONE;
-
     public static Raylib rlj;
     public static ImGuiImplGl3 imGuiGl3;
 
-    public static SteamUGC ugc;
+    public static SteamUserStats stats;
 
     public static void main(String[] args) {
 
         group.Steam.Helpers.Init();
 
-        SteamUser steamUser = new SteamUser(new SteamUserCallback() {});
-
-        SteamUserStats stats = new SteamUserStats(new SteamUserStatsCallback() {
+        stats = new SteamUserStats(new SteamUserStatsCallback() {
 
             @Override
             public void onUserStatsReceived(
@@ -82,127 +78,14 @@ public class Main {
             }
         });
 
-
-        ugc = new SteamUGC(new SteamUGCCallback() {
-            @Override
-            public void onUGCQueryCompleted(
-                    SteamUGCQuery query,
-                    int numResultsReturned,
-                    int totalMatchingResults,
-                    boolean isCachedData,
-                    SteamResult result
-            ) {
-                if (result != SteamResult.OK || numResultsReturned == 0) {
-                    ownershipState = OwnerShipState.ERROR;
-                    ugc.releaseQueryUserUGCRequest(query);
-                    return;
-                }
-
-                SteamUGCDetails details = new SteamUGCDetails();
-                ugc.getQueryUGCResult(query, 0, details);
-
-                SteamID creator = details.getOwnerID();
-                SteamID me = steamUser.getSteamID();
-
-                ownershipState = creator.equals(me) ?
-                        OwnerShipState.OWNED :
-                        OwnerShipState.NOT_OWNED;
-
-                ugc.releaseQueryUserUGCRequest(query);
-            }
-
-            @Override
-            public void onCreateItem(
-                    SteamPublishedFileID id,
-                    boolean needsAgreement,
-                    SteamResult result
-            ) {
-                if (result != SteamResult.OK || needsAgreement) {
-                    return;
-                }
-
-                long steamId = SteamNativeHandle.getNativeHandle(id);
-                CurrentData.Config.level.steamid = steamId;
-
-                Level.Save(
-                        CurrentData.Config.levelname,
-                        CurrentData.Config.level.leveldata,
-                        CurrentData.NEXT_LAYER_ID,
-                        steamId
-                );
-
-                SteamUGCUpdateHandle handle =
-                        ugc.startItemUpdate(4272680, id);
-
-                Path tmp = Path.of(String.valueOf(GetPersistantPath()), "tmp");
-
-                try {
-                    if (Files.exists(tmp)) {
-                        Files.walk(tmp)
-                                .sorted(Comparator.reverseOrder())
-                                .forEach(p -> {
-                                    try {
-                                        Files.delete(p);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                });
-                    }
-
-                    Files.createDirectories(tmp);
-
-                    var image =
-                            rlj.textures.LoadImageFromTexture(renderTexture.texture);
-                    rlj.textures.ExportImage(
-                            image,
-                            tmp.resolve("preview.png").toString()
-                    );
-
-                    Files.copy(
-                            Paths.get(CurrentData.FilePath),
-                            tmp.resolve("level.hil"),
-                            StandardCopyOption.REPLACE_EXISTING
-                    );
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                ugc.setItemContent(handle, tmp.toString());
-                ugc.setItemPreview(handle, tmp.resolve("preview.png").toString());
-
-                ugc.submitItemUpdate(handle, "upload");
-            }
-
-            @Override
-            public void onSubmitItemUpdate(
-                    SteamPublishedFileID id,
-                    boolean needsAgreement,
-                    SteamResult result
-            ) {
-                System.out.println("SubmitItemUpdate: " + result);
-
-                if (result == SteamResult.OK) {
-                    javax.swing.JOptionPane.showMessageDialog(
-                            null,
-                            "Upload finished successfully!",
-                            "Steam Workshop",
-                            javax.swing.JOptionPane.INFORMATION_MESSAGE
-                    );
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(
-                            null,
-                            "Upload failed: " + result,
-                            "Steam Workshop",
-                            javax.swing.JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-        });
-
         Helpers.OSCheckWarning();
 
         CurrentData.FilePath = CurrentData.GetPath();
+
+        if (CurrentData.FilePath == null)
+        {
+            System.exit(1);
+        }
 
         File f = new File(CurrentData.FilePath);
 
