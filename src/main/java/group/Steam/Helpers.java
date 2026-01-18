@@ -7,13 +7,7 @@ public class Helpers {
     {
         try
         {
-            SteamLibraryLoader loader = new SteamLibraryLoader() {
-                @Override
-                public boolean loadLibrary(String name) {
-                    System.loadLibrary(name);
-                    return true;
-                }
-            };
+            SteamLibraryLoader loader = new SteamLibraryLoaderLwjgl3();
 
             SteamAPI.loadLibraries(loader);
 

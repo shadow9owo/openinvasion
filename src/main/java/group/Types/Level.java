@@ -18,15 +18,17 @@ public class Level {
     public String name;
     public List<Layer> leveldata;
     public int nextid;
+    public long steamid = 0;
 
     public Level() {
         this.leveldata = new ArrayList<>();
     }
 
-    public Level(String name, List<Layer> leveldata,int nextid_) {
+    public Level(String name, List<Layer> leveldata,int nextid_,long steamid) {
         this.name = name;
         this.leveldata = (leveldata != null) ? leveldata : new ArrayList<>();
         this.nextid = nextid_;
+        this.steamid = steamid;
     }
 
     public void applyFrom(Level other) {
@@ -62,6 +64,7 @@ public class Level {
                 CurrentData.Config.level.leveldata = loaded.leveldata;
                 CurrentData.Config.levelname = loaded.name;
                 CurrentData.NEXT_LAYER_ID = loaded.nextid;
+                CurrentData.Config.level.steamid = loaded.steamid;
             }
 
         } catch (IOException e) {
@@ -69,7 +72,7 @@ public class Level {
         }
     }
 
-    public static void Save(String name, List<Layer> layers,int nextid_) {
+    public static void Save(String name, List<Layer> layers,int nextid_,long steamid) {
         try {
             Level temp;
 
@@ -77,7 +80,7 @@ public class Level {
                 CurrentData.FilePath = CurrentData.FilePath + ".hil";
             }
 
-            temp = new Level(name, new ArrayList<>(),nextid_);
+            temp = new Level(name, new ArrayList<>(),nextid_,steamid);
 
             for (Layer l : layers) {
                 temp.leveldata.add(l);
