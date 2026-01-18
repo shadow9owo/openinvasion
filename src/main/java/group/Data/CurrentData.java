@@ -41,7 +41,6 @@ public class CurrentData {
             return file.getAbsolutePath();
         }
 
-        System.exit(1);
         return null;
     }
 }
