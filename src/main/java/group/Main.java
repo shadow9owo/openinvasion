@@ -3,6 +3,7 @@ package group;
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 
+import group.Data.CurrentData;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
@@ -18,6 +19,8 @@ public class Main {
     public static void main(String[] args) {
 
         Helpers.OSCheckWarning();
+
+        CurrentData.FilePath = CurrentData.GetPath();
 
         rlj = new Raylib();
         rlj.core.InitWindow(800, 800, "openinvasion editor");
@@ -41,7 +44,7 @@ public class Main {
 
             ImGui.newFrame();
 
-            ImGui.showDemoWindow();
+            //ImGui.showDemoWindow();
 
             ImGui.render();
 
