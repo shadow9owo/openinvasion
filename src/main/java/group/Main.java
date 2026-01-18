@@ -70,7 +70,7 @@
                 Config.Render();
                 Layerlist.Render();
                 Textures.Render();
-                //Tools.Render();
+                Tools.Render();
 
                 ImGui.render();
 

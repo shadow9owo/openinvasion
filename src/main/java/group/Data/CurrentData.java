@@ -2,6 +2,7 @@ package group.Data;
 
 import group.Types.TileIds;
 import group.Types.Layer;
+import group.Types.interactiontype;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,6 +20,8 @@ public class CurrentData {
         public static String levelname;
         public static group.Types.Level level = new group.Types.Level();
     }
+
+    public static interactiontype interactiontype = group.Types.interactiontype.Paint;
 
     public static int currentlayer;
 
