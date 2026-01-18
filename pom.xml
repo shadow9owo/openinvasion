@@ -46,6 +46,24 @@
             <artifactId>imgui-java-natives-windows</artifactId>
             <version>1.90.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.code-disaster.steamworks4j</groupId>
+            <artifactId>steamworks4j</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.code-disaster.steamworks4j</groupId>
+            <artifactId>steamworks4j-lwjgl3</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.code-disaster.steamworks4j</groupId>
+            <artifactId>steamworks4j-server</artifactId>
+            <version>1.10.0</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -39,9 +39,20 @@ public class Config {
             group.Types.Level.Save(CurrentData.Config.levelname,CurrentData.Config.level.leveldata,CurrentData.NEXT_LAYER_ID);
         }
 
+        ImGui.sameLine();
+
         if (ImGui.button("Load"))
         {
             group.Types.Level.Load();
+        }
+
+        ImGui.newLine();
+
+        ImGui.text("SteamWorkshop");
+
+        if (ImGui.button("Upload!"))
+        {
+
         }
 
         ImGui.end();

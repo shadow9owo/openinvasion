@@ -1,5 +1,6 @@
     package group;
 
+    import com.codedisaster.steamworks.*;
     import com.raylib.java.Raylib;
     import com.raylib.java.core.Color;
 
@@ -21,12 +22,25 @@
     import java.util.Date;
     import java.util.List;
 
+    import group.Steam.*;
+
     public class Main {
 
         public static Raylib rlj;
         public static ImGuiImplGl3 imGuiGl3;
 
         public static void main(String[] args) {
+
+            group.Steam.Helpers.Init();
+
+            SteamUGC ugc = new SteamUGC(new SteamUGCCallback() {
+                @Override
+                public void onCreateItem(SteamPublishedFileID id,
+                                         boolean needsAgreement,
+                                         SteamResult result) {
+                    System.out.println("CreateItem: " + result + " id=" + id);
+                }
+            });
 
             Helpers.OSCheckWarning();
 
@@ -83,11 +97,14 @@
                 imGuiGl3.renderDrawData(ImGui.getDrawData());
 
                 rlj.core.EndDrawing();
-            }
 
+                SteamAPI.runCallbacks();
+            }
 
             imGuiGl3.shutdown();
             ImGui.destroyContext();
             rlj.core.CloseWindow();
+
+            group.Steam.Helpers.Shutdown();
         }
     }
