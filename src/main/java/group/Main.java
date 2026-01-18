@@ -1,18 +1,61 @@
 package group;
 
-import com.raylib.*;
-import group.Data.Level;
+import com.raylib.java.Raylib;
+import com.raylib.java.core.Color;
+
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiConfigFlags;
+import imgui.gl3.ImGuiImplGl3;
+
+import group.ImgUi.Helpers;
 
 public class Main {
+
+    public static Raylib rlj;
+    private static ImGuiImplGl3 imGuiGl3;
+
     public static void main(String[] args) {
-        Level.Init();
+        rlj = new Raylib();
+        rlj.core.InitWindow(800, 800, "openinvasion editor");
+        rlj.core.SetTargetFPS(12);
 
-        Raylib.InitWindow(800,800,"abc");
+        ImGui.createContext();
+        ImGui.getIO().addConfigFlags(ImGuiConfigFlags.DockingEnable);
 
-        while (!Raylib.WindowShouldClose())
-        {
-            Raylib.BeginDrawing();
-            Raylib.EndDrawing();
+        imGuiGl3 = new ImGuiImplGl3();
+        imGuiGl3.init("#version 330 core");
+
+        while (!rlj.core.WindowShouldClose()) {
+
+            ImGuiIO io = ImGui.getIO();
+            io.setDisplaySize(800, 800);
+            io.setDeltaTime(1.0f / 12.0f);
+
+            Helpers.updateImGuiInput();
+
+            imGuiGl3.newFrame();
+
+            ImGui.newFrame();
+
+            ImGui.showDemoWindow();
+
+            ImGui.render();
+
+            rlj.core.BeginDrawing();
+            rlj.core.ClearBackground(Color.DARKGRAY);
+
+            rlj.core.rlgl.rlDisableDepthTest();
+            rlj.core.rlgl.rlEnableColorBlend();
+
+            imGuiGl3.renderDrawData(ImGui.getDrawData());
+
+            rlj.core.EndDrawing();
         }
+
+
+        imGuiGl3.shutdown();
+        ImGui.destroyContext();
+        rlj.core.CloseWindow();
     }
 }

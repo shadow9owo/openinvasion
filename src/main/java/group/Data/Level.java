@@ -1,9 +1,13 @@
 package group.Data;
 
-import group.Types.Rect;
+import com.raylib.java.shapes.Rectangle;
 import group.Types.Tile;
 import group.Types.TileIds;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -23,23 +27,35 @@ public class Level {
             Files.createDirectories(base);
 
             Path yamlPath = base.resolve("tiles.yaml");
-            Yaml yaml = new Yaml();
 
-            TilesConfig config;
+            DumperOptions opts = new DumperOptions();
+            opts.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+            Representer rep = new Representer(opts);
+            rep.getPropertyUtils().setSkipMissingProperties(true);
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            loaderOptions.setTagInspector(tag ->
+                    tag.getClassName().equals(TilesConfig.class.getName())
+            );
+
+            Constructor constructor = new Constructor(TilesConfig.class, loaderOptions);
+
+            Yaml yaml = new Yaml(constructor, rep, opts, loaderOptions);
+
+            TilesConfig config = new TilesConfig();
 
             if (!Files.exists(yamlPath)) {
-                config = new TilesConfig();
-
                 for (TileIds id : TileIds.values()) {
-                    Rect rect = Helpers.TileIdToRect(id);
-                    if (rect == null || rect.w <= 0 || rect.h <= 0) continue;
+                    Rectangle rect = Helpers.TileIdToRect(id);
+                    if (rect == null || rect.width <= 0 || rect.height <= 0) continue;
 
                     Tile t = new Tile();
                     t.id = id;
-                    t.x = rect.x;
-                    t.y = rect.y;
-                    t.w = rect.w;
-                    t.h = rect.h;
+                    t.x = (int)rect.x;
+                    t.y = (int)rect.y;
+                    t.w = (int)rect.width;
+                    t.h = (int)rect.height;
 
                     config.tiles.add(t);
                 }
@@ -51,16 +67,7 @@ public class Level {
                 config = yaml.loadAs(in, TilesConfig.class);
             }
 
-            for (Tile t : config.tiles) {
-                TileIds id = t.id;
-                int x = t.x;
-                int y = t.y;
-                int w = t.w;
-                int h = t.h;
-            }
-
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

@@ -1,7 +1,5 @@
 package group.Types;
 
-import group.Types.TileIds;
-
 public class Tile {
     public TileIds id = TileIds.placeholdertexture;
     public int x, y, w, h;
