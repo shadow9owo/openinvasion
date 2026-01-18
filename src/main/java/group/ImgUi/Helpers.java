@@ -9,6 +9,8 @@ import static group.Main.rlj;
 
 import group.Main.*;
 
+import javax.swing.*;
+
 public class Helpers {
     public static void updateImGuiInput() {
         ImGuiIO io = ImGui.getIO();
@@ -51,5 +53,16 @@ public class Helpers {
                 io.addInputCharacter(c);
             }
         }
+    }
+
+    public static void OSCheckWarning()
+    {
+        if (!System.getProperty("os.name").toLowerCase().contains("win"))
+        {
+            JOptionPane.showMessageDialog(null, "Warning", "This program does not support Linux or Mac OS natively\nPlease use WINE or Proton. to run this application\n\nnot doing so might cause instability.",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+
+        return;
     }
 }

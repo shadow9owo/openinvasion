@@ -16,9 +16,12 @@ public class Main {
     private static ImGuiImplGl3 imGuiGl3;
 
     public static void main(String[] args) {
+
+        Helpers.OSCheckWarning();
+
         rlj = new Raylib();
         rlj.core.InitWindow(800, 800, "openinvasion editor");
-        rlj.core.SetTargetFPS(12);
+        rlj.core.SetTargetFPS(60);
 
         ImGui.createContext();
         ImGui.getIO().addConfigFlags(ImGuiConfigFlags.DockingEnable);
@@ -30,7 +33,7 @@ public class Main {
 
             ImGuiIO io = ImGui.getIO();
             io.setDisplaySize(800, 800);
-            io.setDeltaTime(1.0f / 12.0f);
+            io.setDeltaTime(1.0f / 60.0f);
 
             Helpers.updateImGuiInput();
 
